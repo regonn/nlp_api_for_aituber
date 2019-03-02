@@ -30,6 +30,10 @@ def analyze_sentiment():
     text = request.args.get('text')
 
     result = sentiment_analysis.predict(text)
+    # result example
+    # {'label': 'NEGATIVE',
+    # 'score': 0.010753681883215904,
+    # 'elapsed_time': 0.26644086837768555}
     return jsonify({
         'status': 'OK',
         'result': result
