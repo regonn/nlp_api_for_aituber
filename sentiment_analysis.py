@@ -19,6 +19,7 @@ class SentimentAnalysis():
         with open(tokenizer, 'rb') as handle:
             self.tokenizer = pickle.load(handle)
         self.model = load_model(model)
+        model._make_predict_function()
 
     def decode_sentiment(self, score, include_neutral=True):
         if include_neutral:
