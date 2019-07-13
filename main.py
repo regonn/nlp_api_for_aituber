@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from sentiment_analysis import SentimentAnalysis
 from conversation import Conversation
+import tensorflow as tf
+graph = tf.get_default_graph()
 
 SA_TOKENIZER = './models/tokenizer.pkl'
 SA_MODEL = './models/model.h5'
@@ -14,9 +16,9 @@ def _load_model():
     global sentiment_analysis
     global conversation
 
-    sentiment_analysis = SentimentAnalysis(SA_TOKENIZER, SA_MODEL)
-    conversation = Conversation(CONVERSATION_MODEL)
-
+    with graph.as_default():
+        sentiment_analysis = SentimentAnalysis(SA_TOKENIZER, SA_MODEL)
+        conversation = Conversation(CONVERSATION_MODEL)
 
 @app.route('/')
 def hello():
@@ -26,22 +28,24 @@ def hello():
 
 @app.route('/analyze_sentiment')
 def analyze_sentiment():
-    if not sentiment_analysis:
-        _load_model()
+    global graph
+    with graph.as_default():
         if not sentiment_analysis:
-            return 'Sentiment Analysis Model not found.'
+            _load_model()
+            if not sentiment_analysis:
+                return 'Sentiment Analysis Model not found.'
 
-    text = request.args.get('text')
+        text = request.args.get('text')
 
-    result = sentiment_analysis.predict(text)
-    # result example
-    # {'label': 'NEGATIVE',
-    # 'score': 0.010753681883215904,
-    # 'elapsed_time': 0.26644086837768555}
-    return jsonify({
-        'status': 'OK',
-        'result': result
-    })
+        result = sentiment_analysis.predict(text)
+        # result example
+        # {'label': 'NEGATIVE',
+        # 'score': 0.010753681883215904,
+        # 'elapsed_time': 0.26644086837768555}
+        return jsonify({
+            'status': 'OK',
+            'result': result
+        })
 
 
 @app.route('/talk')

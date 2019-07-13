@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    working_dir: /home/aituber
+    ports:
+      - 5000:5000
+    volumes:
+      - ./:/home/aituber
+    command: python main.py

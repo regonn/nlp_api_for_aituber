@@ -3,3 +3,4 @@ data/*
 models/*
 jupyter
 .DS_Store
+.vscode/*
